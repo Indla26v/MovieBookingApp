@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav>
+  <a href="/">Home</a> |
+  <a href="/dashboard">Dashboard</a> |
+  <a href="/logout">Logout</a>
+</nav>
+
+<h1>Welcome, <span th:text="${username}">User</span>!</h1>
+
+<h2>Nearby Theatres</h2>
+<ul>
+  <li th:each="theatre : ${theatres}">
+    <b th:text="${theatre.name}">Theatre Name</b> -
+    <span th:text="${theatre.location}">Location</span>
+  </li>
+</ul>
+
+</body>
+</html>

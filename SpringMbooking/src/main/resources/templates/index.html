@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movie Booking Home</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding-top: 100px;
+        }
+        h1 {
+            color: #333;
+        }
+        .button {
+            background-color: #007bff;
+            border: none;
+            padding: 12px 25px;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to Movie Booking App</h1>
+<p>Search theatres, book shows, and enjoy movies!</p>
+<button class="button" onclick="location.href='/login'">Login</button>
+<button class="button" onclick="location.href='/register'">Register</button>
+</body>
+</html>

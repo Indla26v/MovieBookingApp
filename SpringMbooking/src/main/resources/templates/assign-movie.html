@@ -1,0 +1,51 @@
+<!-- src/main/resources/templates/assign-movie.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Assign Movie to Theatre</title>
+    <meta charset="UTF-8">
+    <!-- In your HTML files (e.g., `assign-movie.html`) -->
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+<body>
+<h1>Assign Movie to Theatre</h1>
+
+<form th:action="@{/manager/assign}" method="post">
+    <label for="movie">Select Movie:</label>
+    <select id="movie" name="movieId" required>
+        <option value="">-- Select --</option>
+        <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}"></option>
+    </select>
+    <br/><br/>
+
+    <!-- IF multiple theatres -->
+    <div th:if="${not singleTheatre}">
+        <label for="theatre">Select Theatre:</label>
+        <select id="theatre" name="theatreId" required>
+            <option value="">-- Select --</option>
+            <option th:each="theatre : ${theatres}" th:value="${theatre.id}" th:text="${theatre.name}"></option>
+        </select>
+    </div>
+
+    <!-- IF only one theatre, hide dropdown and pass ID -->
+    <div th:if="${singleTheatre}">
+        <input type="hidden" name="theatreId" th:value="${theatreId}" />
+        <p>Theatre: <span th:text="${theatres[0].name}"></span></p>
+    </div>
+
+    <br/>
+
+    <label for="showtime">Showtime:</label>
+    <input type="datetime-local" id="showtime" name="showtime" required />
+    <br/><br/>
+
+    <button type="submit">Assign Movie</button>
+</form>
+
+
+<div th:if="${param.success}">
+    <p style="color: green;">Movie assigned successfully!</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/style.css">
+
+  <title>Movie Management</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    form { margin-top: 30px; }
+    input[type="text"], input[type="number"] {
+        width: 300px; padding: 8px; margin: 5px 0;
+    }
+    button { padding: 8px 16px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h1>Movie Management (Admin Panel)</h1>
+
+<!-- ✅ Add New Movie Form -->
+<h2>Add New Movie</h2>
+<form th:action="@{/admin/movies}" method="post">
+  <label>Title:</label><br>
+  <input type="text" name="title" required><br>
+
+  <label>Language:</label><br>
+  <input type="text" name="language" required><br>
+
+  <label>Rating:</label><br>
+  <input type="number" step="0.1" name="rating" min="0" max="10" required><br>
+
+  <button type="submit">Add Movie</button>
+</form>
+
+<!-- ✅ List of Movies -->
+<h2>All Movies</h2>
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Language</th>
+    <th>Rating</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="movie : ${movies}">
+    <td th:text="${movie.title}"></td>
+    <td th:text="${movie.language}"></td>
+    <td th:text="${movie.rating}"></td>
+    <td>
+      <form th:action="@{'/admin/movies/' + ${movie.id}}" method="post">
+        <input type="hidden" name="_method" value="delete"/>
+        <button type="submit" onclick="return confirm('Are you sure to delete this movie?')">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
