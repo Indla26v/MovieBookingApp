@@ -3,9 +3,9 @@
 <head>
     <title>Movie Booking Home</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/style.css">
-
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
+        /* Specific styles for index.html if needed, otherwise rely on style.css */
         body {
             font-family: sans-serif;
             background-color: #f2f2f2;
@@ -23,6 +23,7 @@
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
+            margin: 5px; /* Added margin for separation */
         }
     </style>
 </head>
@@ -30,6 +31,6 @@
 <h1>Welcome to Movie Booking App</h1>
 <p>Search theatres, book shows, and enjoy movies!</p>
 <button class="button" onclick="location.href='/login'">Login</button>
-<button class="button" onclick="location.href='/register'">Register</button>
+<button class="button" onclick="location.href='/auth/register'">Register as User</button>
 </body>
 </html>

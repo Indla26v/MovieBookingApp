@@ -11,6 +11,17 @@ public class Showtime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "theatre_id")
+    private Theatre theatre;
+
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
+
+    private LocalDateTime showtime;
+
+
     public Long getId() {
         return id;
     }
@@ -43,15 +54,7 @@ public class Showtime {
         this.showtime = showtime;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "theatre_id")
-    private Theatre theatre;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-    private Movie movie;
-
-    private LocalDateTime showtime;
 
     // Getters and Setters
 }

@@ -13,7 +13,6 @@ import com.indla.SpringMbooking.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +29,6 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private MovieRepository movieRepo;
 
     @Autowired
@@ -46,12 +42,21 @@ public class AuthController {
 
     // ===================== USER REGISTRATION =====================
 
-    @PostMapping("/register")
-    public String registerUser(@ModelAttribute UserRegistrationDto dto) {
-        boolean success = userService.registerUser(dto, "USER");
-        return success ? "redirect:/login" : "register";
+    @GetMapping("/register")
+    public String showUserRegistrationForm(Model model) {
+        model.addAttribute("userDto", new UserRegistrationDto());
+        return "register";
     }
 
+    @PostMapping("/register")
+    public String registerUser(@ModelAttribute UserRegistrationDto dto, Model model) {
+        if (userService.existsByUsernameOrEmail(dto.getUsername(), dto.getEmail())) {
+            model.addAttribute("error", "Username or email already exists.");
+            return "register";
+        }
+        boolean success = userService.registerUser(dto, "ROLE_USER");
+        return success ? "redirect:/login" : "register";
+    }
 
     // ===================== MANAGER REGISTRATION =====================
 
@@ -67,16 +72,26 @@ public class AuthController {
             model.addAttribute("error", "Username or email already exists.");
             return "register-manager";
         }
+        boolean success = userService.registerUser(userDto, "ROLE_MANAGER");
+        return success ? "redirect:/login?manager_registered" : "register-manager";
+    }
 
-        User manager = new User();
-        manager.setUsername(userDto.getUsername());
-        manager.setEmail(userDto.getEmail());
-        manager.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        manager.setRole("MANAGER");
-        manager.setCreatedAt(LocalDateTime.now());
+    // ===================== ADMIN REGISTRATION =====================
 
-        userService.save(manager);
-        return "redirect:/login?manager_registered";
+    @GetMapping("/register/admin")
+    public String showAdminRegistrationForm(Model model) {
+        model.addAttribute("userDto", new UserRegistrationDto());
+        return "register-admin"; // This will render src/main/resources/templates/register-admin.html
+    }
+
+    @PostMapping("/register/admin")
+    public String registerAdmin(@ModelAttribute("userDto") UserRegistrationDto userDto, Model model) {
+        if (userService.existsByUsernameOrEmail(userDto.getUsername(), userDto.getEmail())) {
+            model.addAttribute("error", "Username or email already exists.");
+            return "register-admin";
+        }
+        boolean success = userService.registerUser(userDto, "ROLE_ADMIN"); // Assign ROLE_ADMIN
+        return success ? "redirect:/login?admin_registered" : "register-admin";
     }
 
     // ===================== ADMIN - MOVIE MANAGEMENT =====================

@@ -18,6 +18,6 @@ public class TheatreController {
     public List<TheatreDto> searchTheatres(@RequestParam String location) {
         return theatreService.searchTheatres(location);
     }
-    public void run(){};
+    //public void run(){}
 
 }

@@ -1,16 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
   <title>Manager Registration</title>
+  <style>
+    /* Specific styles for register-manager.html if needed, otherwise rely on style.css */
+    body { font-family: Arial; text-align: center; padding-top: 70px; background: #f2f2f2; }
+    form { background: #fff; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px #ccc; }
+    input { margin: 10px auto; padding: 10px; width: 250px; display: block; }
+    /* Replaced button style with common button style from style.css */
+  </style>
 </head>
 <body>
-<h2>Register as Manager</h2>
-<form action="/register/manager" method="post">
-  <label>Username:</label><input type="text" name="username" required><br>
-  <label>Email:</label><input type="email" name="email" required><br>
-  <label>Password:</label><input type="password" name="password" required><br>
-  <button type="submit">Register</button>
-</form>
+<div class="container">
+  <h2>Register as Theatre Manager</h2>
+  <form th:action="@{/auth/register/manager}" method="post">
+    <label>Username:</label>
+    <input type="text" name="username" placeholder="Username" required><br>
+
+    <label>Email:</label>
+    <input type="email" name="email" placeholder="Email" required><br>
+
+    <label>Password:</label>
+    <input type="password" name="password" placeholder="Password" required><br>
+
+    <button type="submit">Register Manager</button>
+  </form>
+  <div th:if="${error}" class="error-message" style="color: red; margin-top: 10px;">
+    <p th:text="${error}"></p>
+  </div>
+</div>
 </body>
 </html>
- 

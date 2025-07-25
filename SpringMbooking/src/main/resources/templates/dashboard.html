@@ -3,27 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
-  <link rel="stylesheet" href="/css/style.css">
-
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<!-- ✅ Navbar -->
-<nav>
-  <a href="/">Home</a> |
-  <a href="/dashboard">Dashboard</a> |
-  <a href="/logout">Logout</a>
+<nav class="navbar">
+  <a th:href="@{/}">Home</a>
+  <a th:href="@{/dashboard}">Dashboard</a>
+  <form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-size: 1em; margin-left: 1rem;">Logout</button>
+  </form>
 </nav>
 
-<h1>Welcome, <span th:text="${username}">User</span>!</h1>
+<div class="container">
+  <h1>Welcome, <span th:text="${username}">User</span>!</h1>
 
-<h2>Nearby Theatres</h2>
-<ul>
-  <li th:each="theatre : ${theatres}">
-    <b th:text="${theatre.name}">Theatre Name</b> -
-    <span th:text="${theatre.location}">Location</span>
-  </li>
-</ul>
+  <h2>Nearby Theatres</h2>
+  <ul>
+    <li th:each="theatre : ${theatres}">
+      <b th:text="${theatre.name}">Theatre Name</b> -
+      <span th:text="${theatre.location}">Location</span>
+    </li>
+  </ul>
+</div>
 
 </body>
 </html>

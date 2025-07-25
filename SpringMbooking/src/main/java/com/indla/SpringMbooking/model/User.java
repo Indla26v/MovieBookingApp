@@ -36,11 +36,12 @@ public class User {
 
     public User() {}
 
-    public User(String username, String password, String email, LocalDateTime createdAt) {
+    public User(String username, String password, String email, LocalDateTime createdAt, String role) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.createdAt = createdAt;
+        this.role=role;
     }
 
 
