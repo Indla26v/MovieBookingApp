@@ -1,0 +1,7 @@
+Registration links:
+manager:
+http://localhost:8081/auth/register/manager
+user:
+http://localhost:8081/auth/register
+admin:
+http://localhost:8081/auth/register/admin
