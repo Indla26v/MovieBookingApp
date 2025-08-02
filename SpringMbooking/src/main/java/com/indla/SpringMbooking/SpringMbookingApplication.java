@@ -12,5 +12,3 @@ public class SpringMbookingApplication {
 		SpringApplication.run(SpringMbookingApplication.class, args);
 	}
 }
-
-

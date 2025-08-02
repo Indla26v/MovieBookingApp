@@ -22,25 +22,12 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
-        // --- ADD THIS LOGGING ---
-        System.out.println("DEBUG: Login successful for user: " + authentication.getName());
-        System.out.println("DEBUG: User's authorities (roles): " + roles);
-        // --- END LOGGING ---
-
         if (roles.contains("ROLE_ADMIN")) {
-            // --- ADD THIS LOGGING ---
-            System.out.println("DEBUG: Redirecting ADMIN to: /auth/admin/movies");
-            // --- END LOGGING ---
-            response.sendRedirect("/auth/admin/movies");
+            // FIX: Redirect to the main admin dashboard
+            response.sendRedirect("/admin");
         } else if (roles.contains("ROLE_MANAGER")) {
-            // --- ADD THIS LOGGING ---
-            System.out.println("DEBUG: Redirecting MANAGER to: /auth/manager/assign");
-            // --- END LOGGING ---
             response.sendRedirect("/auth/manager/assign");
         } else {
-            // --- ADD THIS LOGGING ---
-            System.out.println("DEBUG: Redirecting USER (or unhandled role) to: /dashboard");
-            // --- END LOGGING ---
             response.sendRedirect("/dashboard");
         }
     }

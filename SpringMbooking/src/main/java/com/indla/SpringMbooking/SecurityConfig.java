@@ -1,6 +1,7 @@
 package com.indla.SpringMbooking;
 
 import com.indla.SpringMbooking.config.CustomLoginSuccessHandler;
+import com.indla.SpringMbooking.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ public class SecurityConfig {
     @Autowired
     private CustomLoginSuccessHandler loginSuccessHandler;
 
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -26,10 +30,14 @@ public class SecurityConfig {
                         .requestMatchers("/", "/login", "/register", "/auth/register", "/auth/register/manager", "/error").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 
-                        // Role-based access for /auth paths
-                        .requestMatchers("/auth/admin/**").hasRole("ADMIN")
+                        // OAuth2 related endpoints must be public for the flow to work
+                        .requestMatchers("/oauth2/**", "/login/oauth2/code/**").permitAll()
+
+                        // Role-based access for admin paths
+                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN") // Updated to secure all admin routes
+
+                        // Role-based access for manager paths
                         .requestMatchers("/auth/manager/**").hasRole("MANAGER")
-                        .requestMatchers("/auth/register/admin").hasRole("ADMIN") // <-- NEW: Admin registration is admin-only
 
                         // Paths accessible by any relevant authenticated role
                         .requestMatchers("/dashboard", "/bookings/**").hasAnyRole("USER", "ADMIN", "MANAGER")
@@ -42,6 +50,11 @@ public class SecurityConfig {
                         .successHandler(loginSuccessHandler)
                         .permitAll()
                 )
+                .oauth2Login(oauth2 -> {
+                    oauth2.loginPage("/login");
+                    oauth2.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService));
+                    oauth2.successHandler(loginSuccessHandler);
+                })
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
