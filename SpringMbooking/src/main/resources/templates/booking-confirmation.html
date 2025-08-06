@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .confirmation-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 3rem;
+        max-width: 600px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .confirmation-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+        animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(0.8); opacity: 0.5; }
+        50% { transform: scale(1.2); opacity: 0.3; }
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        color: #4caf50;
+        margin-bottom: 1rem;
+        animation: bounce 1s infinite alternate;
+    }
+
+    @keyframes bounce {
+        from { transform: translateY(0px); }
+        to { transform: translateY(-10px); }
+    }
+
+    .confirmation-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2e7d32;
+        margin-bottom: 1rem;
+    }
+
+    .confirmation-message {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .booking-details {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        text-align: left;
+        position: relative;
+        z-index: 1;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2e7d32;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-value {
+        color: #666;
+        text-align: right;
+    }
+
+    .booking-reference {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        padding: 1rem;
+        border-radius: 15px;
+        margin: 1rem 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        border: 2px solid #ddd;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .ticket-preview {
+        background: linear-gradient(45deg, #ffffff, #f8f9fa);
+        border: 2px dashed #4caf50;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        position: relative;
+    }
+
+    .ticket-preview::before,
+    .ticket-preview::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        border-radius: 50%;
+    }
+
+    .ticket-preview::before {
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .ticket-preview::after {
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .qr-placeholder {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(45deg, #333, #666);
+        border-radius: 10px;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .confirmation-container {
+            padding: 2rem;
+            margin: 1rem;
+        }
+
+        .confirmation-title {
+            font-size: 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #4caf50;
+        animation: confetti-fall 3s linear infinite;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+  </style>
+</head>
+<body>
+
+<div class="confirmation-container">
+  <div class="success-icon">
+    <i class="fas fa-check-circle"></i>
+  </div>
+
+  <h1 class="confirmation-title">Booking Confirmed!</h1>
+  <p class="confirmation-message">
+    Your movie tickets have been successfully booked.
+    Please save your booking reference for future use.
+  </p>
+
+  <div class="booking-reference">
+    <i class="fas fa-ticket-alt"></i>
+    Booking Reference: <span th:text="${booking.bookingReference}">BK12345678</span>
+  </div>
+
+  <div class="ticket-preview">
+    <div class="qr-placeholder">
+      <i class="fas fa-qrcode"></i>
+    </div>
+    <div style="text-align: center; color: #666; font-size: 0.9rem;">
+      Show this QR code at the cinema
+    </div>
+  </div>
+
+  <div class="booking-details">
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-film"></i> Movie
+            </span>
+      <span class="detail-value" th:text="${booking.showtime.movie.title}">Movie Title</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-map-marker-alt"></i> Theatre
+            </span>
+      <span class="detail-value" th:text="${booking.showtime.theatre.name}">Theatre Name</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-map-pin"></i> Location
+            </span>
+      <span class="detail-value" th:text="${booking.showtime.theatre.location}">Location</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-calendar-alt"></i> Date & Time
+            </span>
+      <span class="detail-value" th:text="${#temporals.format(booking.showtime.showtime, 'EEEE, MMM dd, yyyy - HH:mm')}">Date & Time</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-chair"></i> Seats
+            </span>
+      <span class="detail-value" th:text="${booking.seatNumbers}">A1, A2, A3</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-users"></i> Number of Seats
+            </span>
+      <span class="detail-value" th:text="${booking.numberOfSeats}">3</span>
+    </div>
+    <div class="detail-row">
+            <span class="detail-label">
+                <i class="fas fa-rupee-sign"></i> Total Amount
+            </span>
+      <span class="detail-value" th:text="'₹' + ${booking.totalAmount}">₹450</span>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <a th:href="@{/bookings/history}" class="btn btn-primary">
+      <i class="fas fa-history"></i> View All Bookings
+    </a>
+    <a th:href="@{/bookings/movies}" class="btn btn-secondary">
+      <i class="fas fa-plus"></i> Book Another Movie
+    </a>
+    <a th:href="@{/dashboard}" class="btn btn-secondary">

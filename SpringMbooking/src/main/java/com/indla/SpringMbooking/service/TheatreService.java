@@ -6,6 +6,7 @@ import com.indla.SpringMbooking.model.Theatre;
 import com.indla.SpringMbooking.model.User;
 import com.indla.SpringMbooking.repository.ShowtimeRepository;
 import com.indla.SpringMbooking.repository.TheatreRepository;
+import com.indla.SpringMbooking.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +23,36 @@ public class TheatreService {
     @Autowired
     private ShowtimeRepository showtimeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<TheatreDto> searchTheatres(String location) {
         List<Theatre> theatres = theatreRepository.findByLocationContainingIgnoreCase(location);
-        return theatres.stream().map(theatre -> {
-            List<Showtime> showtimes = showtimeRepository.findByTheatreOrderByShowtimeAsc(theatre);
-            Showtime nextShowtime = showtimes.stream()
-                    .filter(s -> s.getShowtime().isAfter(LocalDateTime.now()))
-                    .findFirst().orElse(null);
+        return convertToTheatreDto(theatres);
+    }
 
-            String currentMovie = (nextShowtime != null && nextShowtime.getMovie() != null) ? nextShowtime.getMovie().getTitle() : "N/A";
-            Double rating = (nextShowtime != null && nextShowtime.getMovie() != null) ? nextShowtime.getMovie().getRating() : 0.0;
+    public List<TheatreDto> getNearbyTheatres() {
+        List<Theatre> theatres = theatreRepository.findAll();
+        return convertToTheatreDto(theatres);
+    }
+
+    public List<TheatreDto> getAllTheatres() {
+        return getNearbyTheatres();
+    }
+
+    private List<TheatreDto> convertToTheatreDto(List<Theatre> theatres) {
+        return theatres.stream().map(theatre -> {
+            List<Showtime> showtimes = showtimeRepository.findByTheatreAndShowtimeAfterOrderByShowtimeAsc(
+                    theatre, LocalDateTime.now());
+
+            Showtime nextShowtime = showtimes.stream().findFirst().orElse(null);
+
+            String currentMovie = (nextShowtime != null && nextShowtime.getMovie() != null)
+                    ? nextShowtime.getMovie().getTitle() : "No shows scheduled";
+            Double rating = (nextShowtime != null && nextShowtime.getMovie() != null)
+                    ? nextShowtime.getMovie().getRating() : 0.0;
+            String nextShowtimeStr = (nextShowtime != null)
+                    ? nextShowtime.getShowtime().toString() : "No upcoming shows";
 
             return new TheatreDto(
                     theatre.getId(),
@@ -39,24 +60,24 @@ public class TheatreService {
                     theatre.getLocation(),
                     currentMovie,
                     rating,
-                    (nextShowtime != null) ? nextShowtime.getShowtime().toString() : "N/A"
+                    nextShowtimeStr
             );
         }).collect(Collectors.toList());
     }
-    public List<TheatreDto> getNearbyTheatres() {
-        return theatreRepository.findAll()
-                .stream()
-                .map(t -> new TheatreDto(t.getId(), t.getName(), t.getLocation(), null, null, null))
-                .collect(Collectors.toList());
-    }
 
-    public List<Theatre> getAllTheatres() {
+    public List<Theatre> getAllTheatreEntities() {
         return theatreRepository.findAll();
     }
 
+    public Theatre findById(Long id) {
+        return theatreRepository.findById(id).orElse(null);
+    }
+
     public void assignTheatresToManager(Long managerId, List<Long> theatreIds) {
-        User manager = new User();
-        manager.setId(managerId);
+        User manager = userRepository.findById(managerId).orElse(null);
+        if (manager == null) {
+            throw new RuntimeException("Manager not found");
+        }
 
         // First, unassign all theatres from this manager
         List<Theatre> currentTheatres = theatreRepository.findByManager(manager);
@@ -73,5 +94,25 @@ public class TheatreService {
                 theatreRepository.save(theatre);
             }
         }
+    }
+
+    public Theatre save(Theatre theatre) {
+        return theatreRepository.save(theatre);
+    }
+
+    public void deleteById(Long id) {
+        theatreRepository.deleteById(id);
+    }
+
+    public List<Theatre> findByManager(User manager) {
+        return theatreRepository.findByManager(manager);
+    }
+
+    public boolean existsById(Long id) {
+        return theatreRepository.existsById(id);
+    }
+
+    public long count() {
+        return theatreRepository.count();
     }
 }
