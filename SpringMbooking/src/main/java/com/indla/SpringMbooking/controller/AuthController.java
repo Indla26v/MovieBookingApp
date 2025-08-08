@@ -94,26 +94,6 @@ public class AuthController {
         return success ? "redirect:/login?admin_registered" : "register-admin";
     }
 
-    // ===================== ADMIN - MOVIE MANAGEMENT =====================
-
-    @GetMapping("/admin/movies")
-    public String showMovies(Model model) {
-        model.addAttribute("movies", movieRepo.findAll());
-        return "movie";
-    }
-
-    @PostMapping("/admin/movies")
-    public String addMovie(@ModelAttribute Movie movie) {
-        movieRepo.save(movie);
-        return "redirect:/auth/admin/movies";
-    }
-
-    @PostMapping("/admin/movies/{id}")
-    public String deleteMovie(@PathVariable Long id) {
-        movieRepo.deleteById(id);
-        return "redirect:/auth/admin/movies";
-    }
-
     // ===================== MANAGER - ASSIGN MOVIE TO THEATRE =====================
 
     @GetMapping("/manager/assign")

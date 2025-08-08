@@ -1,36 +1,539 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Movie Booking Home</title>
     <meta charset="UTF-8">
+    <title>MovieBook - Your Gateway to Cinema</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Specific styles for index.html if needed, otherwise rely on style.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: sans-serif;
-            background-color: #f2f2f2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            padding-top: 100px;
-        }
-        h1 {
-            color: #333;
-        }
-        .button {
-            background-color: #007bff;
-            border: none;
-            padding: 12px 25px;
             color: white;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px; /* Added margin for separation */
+            position: relative;
+            padding: 2rem;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff08" points="0,0 1000,300 1000,1000 0,700"/><polygon fill="%23ffffff04" points="0,300 1000,100 1000,400 0,600"/></svg>');
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: slideInFromTop 1s ease-out;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            font-weight: 300;
+            animation: slideInFromBottom 1s ease-out 0.3s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .hero-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .hero-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-btn.primary {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            border-color: transparent;
+        }
+
+        .hero-btn.primary:hover {
+            background: linear-gradient(45deg, #45a049, #3e8e41);
+            box-shadow: 0 15px 35px rgba(76, 175, 80, 0.4);
+        }
+
+        .features-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 4rem 2rem;
+            margin: 2rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem 2rem;
+            margin: 2rem;
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-icon {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            animation: floatIcon 8s ease-in-out infinite;
+            font-size: 2rem;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        .floating-icon:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
+        .floating-icon:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 4s; }
+        .floating-icon:nth-child(4) { top: 40%; right: 20%; animation-delay: 6s; }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .features-section,
+            .stats-section {
+                margin: 1rem;
+                padding: 2rem 1rem;
+            }
+
+            .features-title,
+            .cta-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-<h1>Welcome to Movie Booking App</h1>
-<p>Search theatres, book shows, and enjoy movies!</p>
-<button class="button" onclick="location.href='/login'">Login</button>
-<button class="button" onclick="location.href='/auth/register'">Register as User</button>
+
+<div class="hero-section">
+    <div class="hero-background"></div>
+
+    <div class="floating-elements">
+        <i class="floating-icon fas fa-film"></i>
+        <i class="floating-icon fas fa-ticket-alt"></i>
+        <i class="floating-icon fas fa-theater-masks"></i>
+        <i class="floating-icon fas fa-popcorn"></i>
+    </div>
+
+    <div class="hero-content">
+        <h1 class="logo">
+            <i class="fas fa-film"></i> MovieBook
+        </h1>
+        <p class="tagline">
+            Your gateway to the most amazing cinema experiences
+        </p>
+
+        <div class="hero-buttons">
+            <a href="/login" class="hero-btn primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Get Started
+            </a>
+            <a href="/auth/register" class="hero-btn">
+                <i class="fas fa-user-plus"></i>
+                Join Now
+            </a>
+        </div>
+    </div>
+
+    <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</div>
+
+<div class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Movies Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">25+</div>
+            <div class="stat-label">Partner Theatres</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Happy Customers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Online Support</div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <h2 class="features-title">Why Choose MovieBook?</h2>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <i class="feature-icon fas fa-bolt"></i>
+            <h3 class="feature-title">Instant Booking</h3>
+            <p class="feature-description">
+                Book your movie tickets in seconds with our lightning-fast booking system.
+                No queues, no waiting - just pure convenience.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <i class="feature-icon fas fa-chair"></i>
+            <h3 class="feature-title">Best Seat Selection</h3>
+            <p class="feature-description">
+                Choose your perfect seats with our interactive seat selection system.
+                Get the best view for the ultimate movie experience.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <i class="feature-icon fas fa-shield-alt"></i>
+            <h3 class="feature-title">Secure Payments</h3>
+            <p class="feature-description">
+                Your transactions are protected with bank-level security.
+                Book with confidence using our secure payment gateway.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <i class="feature-icon fas fa-mobile-alt"></i>
+            <h3 class="feature-title">Mobile Friendly</h3>
+            <p class="feature-description">
+                Access MovieBook from anywhere, anytime. Our responsive design
+                works perfectly on all your devices.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <i class="feature-icon fas fa-star"></i>
+            <h3 class="feature-title">Latest Movies</h3>
+            <p class="feature-description">
+                Stay updated with the latest blockbusters and indie films.
+                Never miss out on the movies everyone's talking about.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <i class="feature-icon fas fa-headset"></i>
+            <h3 class="feature-title">24/7 Support</h3>
+            <p class="feature-description">
+                Our dedicated support team is always here to help.
+                Get assistance whenever you need it, day or night.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2 class="cta-title">Ready for Your Next Movie Night?</h2>
+    <p class="cta-subtitle">Join thousands of movie lovers who trust MovieBook for their cinema experiences</p>
+
+    <div class="hero-buttons">
+        <a href="/auth/register" class="hero-btn primary">
+            <i class="fas fa-ticket-alt"></i>
+            Start Booking Now
+        </a>
+        <a href="/auth/register/manager" class="hero-btn">
+            <i class="fas fa-building"></i>
+            Partner With Us
+        </a>
+    </div>
+</div>
+
+<script>
+    // Add smooth scrolling for scroll indicator
+    document.querySelector('.scroll-indicator').addEventListener('click', function() {
+        document.querySelector('.stats-section').scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+
+    // Add entrance animations on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animation = 'fadeIn 1s ease-out forwards';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all feature cards and stat items
+    document.addEventListener('DOMContentLoaded', function() {
+        const elements = document.querySelectorAll('.feature-card, .stat-item');
+        elements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.animationDelay = `${index * 0.1}s`;
+            observer.observe(el);
+        });
+
+        // Add counter animation for stats
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const target = stat.textContent;
+            const numericValue = parseInt(target.replace(/\D/g, ''));
+            const suffix = target.replace(/\d/g, '');
+
+            if (numericValue) {
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        stat.textContent = numericValue + suffix;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current) + suffix;
+                    }
+                }, 50);
+            }
+        });
+    });
+
+    // Add parallax effect to floating elements
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelectorAll('.floating-icon');
+        const speed = 0.5;
+
+        parallax.forEach(element => {
+            const yPos = -(scrolled * speed);
+            element.style.transform = `translateY(${yPos}px)`;
+        });
+    });
+</script>
+
 </body>
 </html>
