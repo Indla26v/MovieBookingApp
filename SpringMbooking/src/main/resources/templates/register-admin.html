@@ -4,29 +4,75 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <title>Admin Registration</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    body { font-family: Arial; text-align: center; padding-top: 70px; background: #f2f2f2; }
-    form { background: #fff; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px #ccc; }
-    input { margin: 10px auto; padding: 10px; width: 250px; display: block; }
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Segoe UI', sans-serif;
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100vh; margin: 0;
+    }
+    .register-container {
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+        padding: 3rem; border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        max-width: 400px; width: 100%; text-align: center;
+    }
+    h2 { color: #333; margin-bottom: 0.5rem; font-weight: 700; }
+    p { color: #666; margin-bottom: 2rem; }
+    .form-group { position: relative; margin-bottom: 1.5rem; }
+    .form-input {
+        width: 100%; padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #ddd; border-radius: 15px;
+        font-size: 1rem; transition: all 0.3s ease; box-sizing: border-box;
+    }
+    .form-input:focus {
+        outline: none; border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .input-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #aaa; }
+    .btn-primary {
+        width: 100%; padding: 1rem; border: none; border-radius: 15px;
+        font-size: 1.1rem; font-weight: 600; cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(238, 90, 36, 0.4);
+    }
+    .extra-links { margin-top: 1.5rem; font-size: 0.9rem; }
+    .extra-links a { color: #667eea; text-decoration: none; }
+    .error-message { color: #d32f2f; background: #ffcdd2; padding: 0.75rem; border-radius: 10px; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>Register New Admin</h2>
-  <form th:action="@{/auth/register/admin}" method="post">
-    <label>Username:</label>
-    <input type="text" name="username" placeholder="Username" required><br>
+<div class="register-container">
+  <h2><i class="fas fa-user-shield"></i> Register New Admin</h2>
+  <p>Create a new administrative account</p>
 
-    <label>Email:</label>
-    <input type="email" name="email" placeholder="Email" required><br>
-
-    <label>Password:</label>
-    <input type="password" name="password" placeholder="Password" required><br>
-
-    <button type="submit">Register Admin</button>
-  </form>
-  <div th:if="${error}" class="error-message" style="color: red; margin-top: 10px;">
+  <div th:if="${error}" class="error-message">
     <p th:text="${error}"></p>
+  </div>
+
+  <form th:action="@{/admin/register/admin}" method="post" th:object="${userDto}">
+    <div class="form-group">
+      <i class="fas fa-user input-icon"></i>
+      <input type="text" th:field="*{username}" class="form-input" placeholder="Username" required />
+    </div>
+    <div class="form-group">
+      <i class="fas fa-envelope input-icon"></i>
+      <input type="email" th:field="*{email}" class="form-input" placeholder="Email" required />
+    </div>
+    <div class="form-group">
+      <i class="fas fa-lock input-icon"></i>
+      <input type="password" th:field="*{password}" class="form-input" placeholder="Password" required />
+    </div>
+    <button type="submit" class="btn-primary">Register Admin</button>
+  </form>
+
+  <div class="extra-links">
+    <a th:href="@{/admin/users}">Back to User Management</a>
   </div>
 </div>
 </body>

@@ -4,42 +4,148 @@
     <title>Assign Movie to Theatre</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white; border: none; padding: 0.5rem 1.5rem;
+            border-radius: 25px; cursor: pointer; transition: all 0.3s ease; font-weight: 500;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4);
+        }
+        .nav-link { color: #ffffff; text-decoration: none; font-weight: 500; }
+
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+
+        .form-label {
+            display: block; margin-bottom: 0.5rem;
+            font-weight: 600; color: #333;
+        }
+
+        .form-input {
+            width: 100%; padding: 1rem; border: 2px solid #ddd;
+            border-radius: 15px; font-size: 1rem; transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none; border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white; border: none; padding: 1rem 2rem;
+            border-radius: 15px; cursor: pointer; font-weight: 600;
+            font-size: 1rem; width: 100%; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .success-message {
+            text-align: center; padding: 1rem; margin-top: 1.5rem;
+            background: #d4edda; color: #155724; border-radius: 10px;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-<h1>Assign Movie to Theatre</h1>
 
-<form th:action="@{/auth/manager/assign}" method="post">
-    <label for="movie">Select Movie:</label>
-    <select id="movie" name="movieId" required>
-        <option value="">-- Select --</option>
-        <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}"></option>
-    </select>
-    <br/><br/>
-
-    <div th:if="${not singleTheatre}">
-        <label for="theatre">Select Theatre:</label>
-        <select id="theatre" name="theatreId" required>
-            <option value="">-- Select --</option>
-            <option th:each="theatre : ${theatres}" th:value="${theatre.id}" th:text="${theatre.name} + ' (' + ${theatre.location} + ')'"></option>
-        </select>
+<nav class="navbar">
+    <div class="nav-content">
+        <a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-tachometer-alt"></i> Manager Dashboard</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
     </div>
+</nav>
 
-    <div th:if="${singleTheatre}">
-        <input type="hidden" name="theatreId" th:value="${theatreId}" />
-        <p>Theatre: <span th:text="${theatres[0].name}"></span></p>
+<div class="form-container">
+    <h1><i class="fas fa-calendar-plus"></i> Assign Movie to Theatre</h1>
+
+    <form th:action="@{/auth/manager/assign}" method="post">
+        <div class="form-group">
+            <label for="movie" class="form-label">Select Movie:</label>
+            <select id="movie" name="movieId" class="form-input" required>
+                <option value="">-- Select Movie --</option>
+                <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}"></option>
+            </select>
+        </div>
+
+        <div class="form-group" th:if="${not singleTheatre}">
+            <label for="theatre" class="form-label">Select Theatre:</label>
+            <select id="theatre" name="theatreId" class="form-input" required>
+                <option value="">-- Select Theatre --</option>
+                <option th:each="theatre : ${theatres}" th:value="${theatre.id}" th:text="${theatre.name} + ' (' + ${theatre.location} + ')'"></option>
+            </select>
+        </div>
+
+        <div class="form-group" th:if="${singleTheatre}">
+            <label class="form-label">Assigned Theatre:</label>
+            <input type="hidden" name="theatreId" th:value="${theatreId}" />
+            <p class="form-input" style="background-color: #f8f9fa;" th:text="${theatres[0].name}"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="showtime" class="form-label">Showtime:</label>
+            <input type="datetime-local" id="showtime" name="showtime" class="form-input" required />
+        </div>
+
+        <button type="submit" class="submit-btn"><i class="fas fa-check"></i> Assign Movie</button>
+    </form>
+
+    <div th:if="${param.success}" class="success-message">
+        <i class="fas fa-check-circle"></i> Movie assigned successfully!
     </div>
-
-    <br/>
-
-    <label for="showtime">Showtime:</label>
-    <input type="datetime-local" id="showtime" name="showtime" required />
-    <br/><br/>
-
-    <button type="submit">Assign Movie</button>
-</form>
-
-<div th:if="${param.success}">
-    <p class="success">Movie assigned successfully!</p>
 </div>
 </body>
 </html>
