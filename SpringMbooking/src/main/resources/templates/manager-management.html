@@ -51,7 +51,7 @@
         .close-btn { background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; transition: color 0.3s ease; }
         .close-btn:hover { color: #333; }
 
-        /* Form elements from assign-movie */
+        /* Form elements */
         .form-group { margin-bottom: 1.5rem; }
         .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
         .form-input { width: 100%; padding: 1rem; border: 2px solid #ddd; border-radius: 15px; font-size: 1rem; transition: all 0.3s ease; box-sizing: border-box; }
@@ -101,9 +101,16 @@
                     </ul>
                 </td>
                 <td>
-                    <button class="action-btn btn-edit" th:onclick="'showEditModal(\'' + ${manager.id} + '\', \'' + ${manager.username} + '\', \'' + ${manager.email} + '\', \'' + ${#strings.listJoin(managerTheatresMap.get(manager.id).![id], ',')} + '\')'"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="action-btn btn-edit"
+                            th:data-manager-id="${manager.id}"
+                            th:data-manager-username="${manager.username}"
+                            th:data-manager-email="${manager.email}"
+                            th:data-assigned-theatres="${#strings.listJoin(managerTheatresMap.get(manager.id).![id], ',')}"
+                            onclick="showEditModal(this)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                     <form th:action="@{'/admin/managers/' + ${manager.id} + '/delete'}" method="post" style="display:inline;">
-                        <button type="submit" class="action-btn btn-delete" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i> Delete</button>
+                        <button type="submit" class="action-btn btn-delete" onclick="return confirm('This will unassign all theatres from this manager and delete them. Are you sure?')"><i class="fas fa-trash"></i> Delete</button>
                     </form>
                 </td>
             </tr>
@@ -118,7 +125,7 @@
             <h2 class="modal-title">Edit Manager</h2>
             <button class="close-btn">&times;</button>
         </div>
-        <form th:action="@{/admin/managers/update}" method="post" th:object="${managerUpdateDto}">
+        <form th:action="@{/admin/managers/update}" method="post">
             <input type="hidden" id="managerId" name="id">
 
             <div class="form-group">
@@ -147,13 +154,19 @@
     const modal = document.getElementById('editModal');
     const closeBtn = modal.querySelector('.close-btn');
 
-    function showEditModal(id, username, email, assignedTheatreIds) {
+    // **FIX START** - Updated JavaScript function
+    function showEditModal(buttonElement) {
+        const id = buttonElement.getAttribute('data-manager-id');
+        const username = buttonElement.getAttribute('data-manager-username');
+        const email = buttonElement.getAttribute('data-manager-email');
+        const assignedTheatreIds = buttonElement.getAttribute('data-assigned-theatres');
+
         document.getElementById('managerId').value = id;
         document.getElementById('editUsername').value = username;
         document.getElementById('editEmail').value = email;
 
         const theatreSelect = document.getElementById('theatreIds');
-        const assignedIds = assignedTheatreIds.split(',').map(Number);
+        const assignedIds = assignedTheatreIds ? assignedTheatreIds.split(',').map(Number) : [];
 
         for (let i = 0; i < theatreSelect.options.length; i++) {
             theatreSelect.options[i].selected = assignedIds.includes(Number(theatreSelect.options[i].value));
@@ -161,6 +174,7 @@
 
         modal.style.display = 'block';
     }
+    // **FIX END**
 
     closeBtn.onclick = function() { modal.style.display = 'none'; }
     window.onclick = function(event) {

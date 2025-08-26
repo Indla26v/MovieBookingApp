@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --background-color: #f4f7fc;
+            --card-background: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --border-radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        .dashboard-section {
+            display: none; /* Hidden by default */
+        }
+
+        .dashboard-section.active {
+            display: block; /* Shown when active */
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Cards & General Styles --- */
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+        /* --- Stats Cards --- */
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card-1 { border-color: #667eea; }
+        .stat-card-2 { border-color: #4ecdc4; }
+        .stat-card-3 { border-color: #feca57; }
+        .stat-card-4 { border-color: #ff6b6b; }
+        .stat-number { font-size: 2.5rem; font-weight: 700; }
+        .stat-label { font-weight: 500; color: var(--text-secondary); }
+
+        /* --- Forms & Tables --- */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border-color); }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        tr:hover { background: #f8f9fa; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-input {
+            width: 100%; padding: 1rem; border: 2px solid var(--border-color);
+            border-radius: 15px; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .form-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+
+        .btn {
+            border: none; padding: 1rem 2rem; border-radius: 15px; cursor: pointer;
+            font-weight: 600; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-edit { background: #feca57; color: #333; }
+        .btn-delete { background: #ff6b6b; color: white; }
+
+        /* --- QR Scanner Section --- */
+        .qr-scanner-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .camera-view {
+            background: #333;
+            border-radius: var(--border-radius);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        .camera-view i { font-size: 4rem; margin-bottom: 1rem; }
+
+        .scan-result-placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .scan-result-details { display: none; }
+        .result-item { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { font-weight: 600; }
+        .status-paid { color: #4caf50; font-weight: 700; }
+        .status-error { color: #d32f2f; font-weight: 700; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            .qr-scanner-container { grid-template-columns: 1fr; }
+            .navbar { flex-direction: column; gap: 1rem; }
+        }
+        @media (max-width: 768px) {
+            .grid-4 { grid-template-columns: 1fr 1fr; }
+            .nav-menu { flex-direction: column; width: 100%; text-align: center; }
+            .nav-link { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <nav class="navbar">
+        <div class="nav-brand"><i class="fas fa-user-tie"></i> Manager Panel</div>
+        <ul class="nav-menu">
+            <li><a href="#home" class="nav-link active" data-section="home"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="#assign" class="nav-link" data-section="assign"><i class="fas fa-plus-circle"></i> Assign Movie</a></li>
+            <li><a href="#manage" class="nav-link" data-section="manage"><i class="fas fa-film"></i> Manage Shows</a></li>
+            <li><a href="#bookings" class="nav-link" data-section="bookings"><i class="fas fa-ticket-alt"></i> View Bookings</a></li>
+            <li><a href="#scanner" class="nav-link" data-section="scanner"><i class="fas fa-qrcode"></i> QR Scanner</a></li>
+        </ul>
+        <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </nav>
+
+    <main class="main-content">
+        <section id="home" class="dashboard-section active">
+            <div class="header">
+                <h1>Welcome, Manager!</h1>
+                <p>Here's a quick overview of your theatre operations.</p>
+            </div>
+            <div class="grid grid-4">
+                <div class="card stat-card stat-card-1">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Movies Assigned</div>
+                </div>
+                <div class="card stat-card stat-card-2">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Upcoming Shows Today</div>
+                </div>
+                <div class="card stat-card stat-card-3">
+                    <div class="stat-number">152</div>
+                    <div class="stat-label">Bookings Today</div>
+                </div>
+                <div class="card stat-card stat-card-4">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Theatres Managed</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assign" class="dashboard-section">
+            <div class="header"><h1>Assign New Movie Showtime</h1></div>
+            <div class="card">
+                <form>
+                    <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="theatre" class="form-label">Select Theatre</label>
+                            <select id="theatre" class="form-input">
+                                <option>Cineplex Downtown</option>
+                                <option>Riverside Movies</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="movie" class="form-label">Select Movie</label>
+                            <select id="movie" class="form-input">
+                                <option>Galaxy Quest</option>
+                                <option>Starlight Odyssey</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="showtime" class="form-label">Showtime</label>
+                            <input type="datetime-local" id="showtime" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="screen" class="form-label">Screen Number</label>
+                            <input type="number" id="screen" class="form-input" placeholder="e.g., 3">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Assignment</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="manage" class="dashboard-section">
+            <div class="header"><h1>Manage Current Showtimes</h1></div>
+            <div class="card">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Movie Name</th>
+                        <th>Showtime</th>
+                        <th>Screen</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Galaxy Quest</td>
+                        <td>2025-08-11 18:00</td>
+                        <td>Screen 1</td>
+                        <td>
+                            <button class="btn btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-delete"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Starlight Odyssey</td>
+                        <td>2025-08-11 21:00</td>
+                        <td>Screen 2</td>
+                        <td>
+                            <button class="btn btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-delete"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="bookings" class="dashboard-section">
+            <div class="header"><h1>View Theatre Bookings</h1></div>
+            <div class="card">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>User Name</th>
+                        <th>Movie</th>
+                        <th>Showtime</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>BK-1A2B3C</td>
+                        <td>John Doe</td>
+                        <td>Galaxy Quest</td>
+                        <td>18:00</td>
+                        <td class="status-paid">Paid</td>
+                    </tr>
+                    <tr>
+                        <td>BK-4D5E6F</td>
+                        <td>Jane Smith</td>
+                        <td>Starlight Odyssey</td>
+                        <td>21:00</td>
+                        <td class="status-paid">Paid</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="scanner" class="dashboard-section">
+            <div class="header"><h1>QR Code Attendance Scanner</h1></div>
+            <div class="qr-scanner-container">
+                <div class="card camera-view">
+                    <i class="fas fa-video"></i>
+                    <p>Camera View Placeholder</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="simulateScan()">
+                        <i class="fas fa-qrcode"></i> Simulate Scan
+                    </button>
+                </div>
+                <div class="card">
+                    <h2>Scan Result</h2>
+                    <hr style="margin: 1rem 0;">
+                    <div id="scanResultPlaceholder" class="scan-result-placeholder">
+                        <p><i class="fas fa-search"></i> Ready to scan a ticket.</p>
+                    </div>
+                    <div id="scanResultDetails" class="scan-result-details">
+                        <div class="result-item">
+                            <span class="result-label">User:</span>
+                            <span id="resultUser"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Movie:</span>
+                            <span id="resultMovie"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Showtime:</span>
+                            <span id="resultShowtime"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Status:</span>
+                            <span id="resultStatus"></span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-check-circle"></i> Mark as Present
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.dashboard-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+
+                // Update active link
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Update active section
+                sections.forEach(sec => {
+                    if (sec.id === sectionId) {
+                        sec.classList.add('active');
+                    } else {
+                        sec.classList.remove('active');
+                    }
+                });
+            });
+        });
+    });
+
+    // --- QR Scanner Simulation ---
+    let hasBeenScanned = false; // To simulate re-use error
+    function simulateScan() {
+        const placeholder = document.getElementById('scanResultPlaceholder');
+        const details = document.getElementById('scanResultDetails');
+
+        placeholder.style.display = 'none';
+        details.style.display = 'block';
+
+        if (hasBeenScanned) {
+            document.getElementById('resultUser').textContent = 'N/A';
+            document.getElementById('resultMovie').textContent = 'N/A';
+            document.getElementById('resultShowtime').textContent = 'N/A';
+            document.getElementById('resultStatus').innerHTML = '<span class="status-error">Ticket Already Used</span>';
+            details.querySelector('button').disabled = true;
+        } else {
+            document.getElementById('resultUser').textContent = 'John Doe';
+            document.getElementById('resultMovie').textContent = 'Galaxy Quest';
+            document.getElementById('resultShowtime').textContent = 'Today, 18:00';
+            document.getElementById('resultStatus').innerHTML = '<span class="status-paid">Paid</span>';
+            details.querySelector('button').disabled = false;
+            hasBeenScanned = true;
+        }
+    }
+</script>
+</body>
+</html>

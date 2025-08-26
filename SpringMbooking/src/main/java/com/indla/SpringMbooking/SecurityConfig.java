@@ -1,6 +1,7 @@
 package com.indla.SpringMbooking;
 
 import com.indla.SpringMbooking.config.CustomLoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
@@ -22,33 +22,28 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Publicly accessible paths
+                        // Publicly accessible paths for login, registration, and static resources
                         .requestMatchers("/", "/login", "/register", "/auth/register",
                                 "/auth/register/manager", "/auth/register/admin", "/error").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 
                         // Role-based access for admin paths
-                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Role-based access for manager paths
-                        .requestMatchers("/auth/manager/**").hasRole("MANAGER")
+                        // **UPDATED:** Role-based access for manager paths
+                        // This now includes both the old path and the new /manager/** path
+                        .requestMatchers("/auth/manager/**", "/manager/**").hasRole("MANAGER")
 
-                        // Booking paths accessible by authenticated users
-                        .requestMatchers("/bookings/**").hasAnyRole("USER", "ADMIN", "MANAGER")
-
-                        // Dashboard accessible by any authenticated user
-                        .requestMatchers("/dashboard", "/search").hasAnyRole("USER", "ADMIN", "MANAGER")
-
-                        // API endpoints
+                        // Paths accessible by any authenticated user (USER, MANAGER, or ADMIN)
+                        .requestMatchers("/bookings/**", "/dashboard", "/search").hasAnyRole("USER", "ADMIN", "MANAGER")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "MANAGER")
-                        .requestMatchers("/auth/admin/**").hasRole("ADMIN")
 
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(loginSuccessHandler) // Use custom handler for role-based redirection
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -58,10 +53,6 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                )
-                .sessionManagement(session -> session
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
                 )
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/login?access-denied=true")
