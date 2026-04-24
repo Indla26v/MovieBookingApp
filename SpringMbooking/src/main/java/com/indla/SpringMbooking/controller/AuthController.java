@@ -58,42 +58,6 @@ public class AuthController {
         return success ? "redirect:/login" : "register";
     }
 
-    // ===================== MANAGER REGISTRATION =====================
-
-    @GetMapping("/register/manager")
-    public String showManagerRegistrationForm(Model model) {
-        model.addAttribute("userDto", new UserRegistrationDto());
-        return "register-manager";
-    }
-
-    @PostMapping("/register/manager")
-    public String registerManager(@ModelAttribute("userDto") UserRegistrationDto userDto, Model model) {
-        if (userService.existsByUsernameOrEmail(userDto.getUsername(), userDto.getEmail())) {
-            model.addAttribute("error", "Username or email already exists.");
-            return "register-manager";
-        }
-        boolean success = userService.registerUser(userDto, "ROLE_MANAGER");
-        return success ? "redirect:/login?manager_registered" : "register-manager";
-    }
-
-    // ===================== ADMIN REGISTRATION =====================
-
-    @GetMapping("/register/admin")
-    public String showAdminRegistrationForm(Model model) {
-        model.addAttribute("userDto", new UserRegistrationDto());
-        return "register-admin"; // This will render src/main/resources/templates/register-admin.html
-    }
-
-    @PostMapping("/register/admin")
-    public String registerAdmin(@ModelAttribute("userDto") UserRegistrationDto userDto, Model model) {
-        if (userService.existsByUsernameOrEmail(userDto.getUsername(), userDto.getEmail())) {
-            model.addAttribute("error", "Username or email already exists.");
-            return "register-admin";
-        }
-        boolean success = userService.registerUser(userDto, "ROLE_ADMIN"); // Assign ROLE_ADMIN
-        return success ? "redirect:/login?admin_registered" : "register-admin";
-    }
-
     // ===================== MANAGER - ASSIGN MOVIE TO THEATRE =====================
 
     @GetMapping("/manager/assign")
